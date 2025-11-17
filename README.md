@@ -1,7 +1,7 @@
-<H3>VIMALA SAHANA W </H3>
-<H3>212223040241</H3>
+<H3>NAME:EASWARI M</H3>
+<H3>REGISTER NO:212223240033</H3>
 <H3>EX. NO.3</H3>
-<H3>29/09/2025</H3>
+<H3>DATE:10/10/2024</H3>
 <H2 aligh = center> Implementation of MLP for a non-linearly separable data</H2>
 <h3>Aim:</h3>
 To implement a perceptron for classification using Python
@@ -20,8 +20,7 @@ The graph plots the two inputs corresponding to their output. Visualizing this p
 For a problem resembling the outputs of XOR, it was impossible for the machine to set up an equation for good outputs. This is what led to the birth of the concept of hidden layers which are extensively used in Artificial Neural Networks. The solution to the XOR problem lies in multidimensional analysis. We plug in numerous inputs in various layers of interpretation and processing, to generate the optimum outputs.
 The inner layers for deeper processing of the inputs are known as hidden layers. The hidden layers are not dependent on any other layers. This architecture is known as Multilayer Perceptron (MLP).
 ![Img 4](https://user-images.githubusercontent.com/112920679/195775183-1f64fe3d-a60e-4998-b4f5-abce9534689d.gif)
-The number of layers in MLP is not fixed and thus can have any number of hidden layers for processing. In the case of MLP, the weights are defined for each hidden layer, which transfers the signal to the next proceeding layer.Using the MLP approach lets us dive into more than two dimensions, which in turn lets us separate the outputs of XOR using multidimensional equations.Each hidden unit invokes an activation function, to range down their output values to 0 or The MLP approach also lies in the class of feed-forward Artificial Neural Network, and thus can only communicate in one direction. MLP solves the XOR 
-problem efficiently by visualizing the data points in multi-dimensions and thus constructing an n-variable equation to fit in the output values using back propagation algorithm
+The number of layers in MLP is not fixed and thus can have any number of hidden layers for processing. In the case of MLP, the weights are defined for each hidden layer, which transfers the signal to the next proceeding layer.Using the MLP approach lets us dive into more than two dimensions, which in turn lets us separate the outputs of XOR using multidimensional equations.Each hidden unit invokes an activation function, to range down their output values to 0 or The MLP approach also lies in the class of feed-forward Artificial Neural Network, and thus can only communicate in one direction. MLP solves the XOR problem efficiently by visualizing the data points in multi-dimensions and thus constructing an n-variable equation to fit in the output values using back propagation algorithm
 
 <h3>Algorithm :</H3>
 
@@ -37,79 +36,82 @@ Step 3: Repeat the  iteration  until the losses become constant and  minimum<BR>
 Step 4 : Test for the XOR patterns.
 
 <H3>Program:</H3>
+
 ```
-
-
-
 import numpy as np
+import pandas as pd
+import io
 import matplotlib.pyplot as plt
 
+x=np.array([[0,0,1,1],[0,1,0,1]])
+y=np.array([[0,1,1,0]])
+n_x = 2
+n_y = 1
+n_h = 2
+m = x.shape[1]
+lr = 0.1
+np.random.seed(2)
+w1 = np.random.rand(n_h,n_x)  
+w2 = np.random.rand(n_y,n_h)   
+losses = []
 
+def sigmoid(z):
+    z= 1/(1+np.exp(-z))
+    return z
 
+def forward_prop(w1,w2,x):
+    z1 = np.dot(w1,x)
+    a1 = sigmoid(z1)
+    z2 = np.dot(w2,a1)
+    a2 = sigmoid(z2)
+    return z1,a1,z2,a2
 
+def back_prop(m,w1,w2,z1,a1,z2,a2,y):
+  dz2 = a2-y
+  dw2 = np.dot(dz2,a1.T)/m
+  dz1 = np.dot(w2.T,dz2) * a1*(1-a1)
+  dw1 = np.dot(dz1,x.T)/m
+  dw1 = np.reshape(dw1,w1.shape)
+  dw2 = np.reshape(dw2,w2.shape)
+  return dz2,dw2,dz1,dw1
 
-x=np.array([[0,0],[0,1],[1,0],[1,1]])
-y=np.array([[0],[1],[1],[0]])
-
-input_size=2
-hidden_layer=3
-output_size=1
-
-w1=np.random.randn(input_size,hidden_layer)
-b1=np.zeros((1,hidden_layer))
-w2=np.random.randn(hidden_layer,output_size)
-b2=np.zeros((1,output_size))
-def sigmoid_function(x):
-  return 1/(1+np.exp(-x))
-
-def sigmoid_derivative(x):
-  return x*(1-x)
-  
-
-
-
-losses=[]
-
-for epochs in range(10000):
-  hidden_input=np.dot(x,w1)+b1
-  hidden_output=sigmoid_function(hidden_input)
-  output_layer_input=np.dot(hidden_output,w2)+b2
-  output=sigmoid_function(output_layer_input)
-
-  error=y-output
-  loss=np.mean(error**2)
-  losses.append(loss)
-
-  d_out=error*sigmoid_derivative(output)
-  d_hidden=np.dot(d_out, w2.T)*sigmoid_derivative(hidden_output)
-
-  w2 += np.dot(hidden_output.T, d_out) * 0.1
-  b2 += np.sum(d_out, axis=0, keepdims=True) * 0.1
-
-  w1 += np.dot(x.T, d_hidden) * 0.1
-  b1 += np.sum(d_hidden, axis=0, keepdims=True) * 0.1
-
-for v,out in zip(x,output):
-  print(f"Input: {v}, Output: {np.round(out)}")
-
-
-
+iterations = 10000
+for i in range(iterations):
+    z1,a1,z2,a2 = forward_prop(w1,w2,x)
+    loss = -(1/m)*np.sum(y*np.log(a2)+(1-y)*np.log(1-a2))
+    losses.append(loss)
+    da2,dw2,dz1,dw1 = back_prop(m,w1,w2,z1,a1,z2,a2,y)
+    w2 = w2-lr*dw2
+    w1 = w1-lr*dw1
 
 plt.plot(losses)
-plt.title("Loss Curve")
-plt.xlabel("Epoch")
-plt.ylabel("Loss")
-plt.grid(True)
-plt.show()
+plt.xlabel("EPOCHS")
+plt.ylabel("Loss value")
+
+def predict(w1,w2,input):
+    z1,a1,z2,a2 = forward_prop(w1,w2,test)
+    a2 = np.squeeze(a2)
+    if a2>=0.5:
+        print( [i[0] for i in input], 1)
+    else:
+        print( [i[0] for i in input], 0)
+
+print('Input',' Output')
+test=np.array([[1],[0]])
+predict(w1,w2,test)
+test=np.array([[1],[1]])
+predict(w1,w2,test)
+test=np.array([[0],[1]])
+predict(w1,w2,test)
+test=np.array([[0],[0]])
+predict(w1,w2,test)
 ```
+
 <H3>Output:</H3>
 
-<img width="717" height="550" alt="image" src="https://github.com/user-attachments/assets/4b0dcab6-4e4e-4cc6-b796-fff5ef21b291" />
+![image](https://github.com/user-attachments/assets/5f29ed3f-186f-410e-876e-bed4bed3e9c1)
 
-<img width="717" height="610" alt="image" src="https://github.com/user-attachments/assets/ccdb279b-a23e-4436-b665-75105e7e39dd" />
-
-
-
+![image](https://github.com/user-attachments/assets/5e9645b8-899e-4a4c-955f-fbf6c9444a57)
 
 <H3> Result:</H3>
-Thus, XOR classification problem can be solved using MLP in Python
+Thus, XOR classification problem can be solved using MLP in Python 
